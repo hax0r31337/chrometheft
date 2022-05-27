@@ -1,5 +1,6 @@
 # chrometheft
-Flexible Chrome password theft for Windows
+Flexible Chrome password/cookie theft for Windows    
+[![Go Reference](https://pkg.go.dev/badge/github.com/liulihaocai/chrometheft.svg)](https://pkg.go.dev/github.com/liulihaocai/chrometheft)
 
 # Usage
 ## Quick start
