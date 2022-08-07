@@ -1,4 +1,4 @@
-module github.com/liulihaocai/chrometheft
+module github.com/kotonemywaifu/chrometheft
 
 go 1.18
 

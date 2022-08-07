@@ -1,6 +1,5 @@
 # chrometheft
-Flexible Chrome password/cookie theft for Windows    
-[![Go Reference](https://pkg.go.dev/badge/github.com/liulihaocai/chrometheft.svg)](https://pkg.go.dev/github.com/liulihaocai/chrometheft)
+Flexible Chrome password theft for Windows
 
 # Usage
 ## Quick start
@@ -12,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/liulihaocai/chrometheft"
+	"github.com/kotonemywaifu/chrometheft"
 )
 
 func main() {
